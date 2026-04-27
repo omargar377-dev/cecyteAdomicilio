@@ -1,0 +1,58 @@
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+import { colors } from '../constants/colors';
+import type { CartItem } from '../types';
+
+type Props = {
+  item: CartItem;
+};
+
+function formatPrice(n: number) {
+  return `$${n.toFixed(2)}`;
+}
+
+export function CartLineItem({ item }: Props) {
+  const lineTotal = item.product.price * item.quantity;
+  return (
+    <View style={styles.row}>
+      <View style={styles.textCol}>
+        <Text style={styles.name}>{item.product.name}</Text>
+        <Text style={styles.meta}>
+          {formatPrice(item.product.price)} × {item.quantity}
+        </Text>
+      </View>
+      <Text style={styles.lineTotal}>{formatPrice(lineTotal)}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  textCol: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  name: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  meta: {
+    marginTop: 4,
+    fontSize: 15,
+    color: colors.muted,
+  },
+  lineTotal: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+});

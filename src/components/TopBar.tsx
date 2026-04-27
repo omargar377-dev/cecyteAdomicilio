@@ -1,0 +1,138 @@
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import { colors } from '../constants/colors';
+
+type Props = {
+  searchQuery: string;
+  onSearchChange: (text: string) => void;
+  onCartPress: () => void;
+  cartCount: number;
+};
+
+export function TopBar({
+  searchQuery,
+  onSearchChange,
+  onCartPress,
+  cartCount,
+}: Props) {
+  return (
+    <View style={styles.row}>
+      <View style={styles.logoWrap}>
+        <Text style={styles.logoText}>☕</Text>
+        <Text style={styles.logoLabel}>CECyte</Text>
+      </View>
+
+      <View style={styles.searchWrap}>
+        <Ionicons
+          name="search"
+          size={18}
+          color={colors.muted}
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar..."
+          placeholderTextColor={colors.muted}
+          value={searchQuery}
+          onChangeText={onSearchChange}
+          returnKeyType="search"
+          accessibilityLabel="Buscar productos"
+        />
+      </View>
+
+      <TouchableOpacity
+        style={styles.cartBtn}
+        onPress={onCartPress}
+        accessibilityRole="button"
+        accessibilityLabel="Ver carrito"
+      >
+        <Ionicons name="cart-outline" size={26} color={colors.primaryDark} />
+        {cartCount > 0 ? (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>
+              {cartCount > 99 ? '99+' : cartCount}
+            </Text>
+          </View>
+        ) : null}
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  logoWrap: {
+    alignItems: 'center',
+    minWidth: 56,
+  },
+  logoText: {
+    fontSize: 28,
+  },
+  logoLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+    marginTop: -2,
+  },
+  searchWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 10,
+    minHeight: 48,
+  },
+  searchIcon: {
+    marginRight: 6,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+    paddingVertical: 8,
+  },
+  cartBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: colors.cream,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  badge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+});
