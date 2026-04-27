@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import type { TicketScreenProps } from '../navigation/types';
 
 function formatPrice(n: number) {
@@ -16,6 +17,8 @@ function formatPrice(n: number) {
 }
 
 export function TicketScreen({ navigation, route }: TicketScreenProps) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const { orderNumber, ticketCode, paymentMethod, total, lines } = route.params;
 
   const paymentLabel = useMemo(
@@ -78,7 +81,8 @@ export function TicketScreen({ navigation, route }: TicketScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,

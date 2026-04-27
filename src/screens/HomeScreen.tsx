@@ -4,6 +4,7 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -18,16 +19,19 @@ import { CategoryGrid } from '../components/CategoryGrid';
 import { FooterLegal } from '../components/FooterLegal';
 import { IntroOverlay } from '../components/IntroOverlay';
 import { TopBar } from '../components/TopBar';
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
 import { CONTACT_EMAIL } from '../constants/contact';
 import { useCart } from '../context/CartContext';
+import { useAppTheme } from '../context/ThemeContext';
 import { getBestSellers } from '../data/mockProducts';
 import type { HomeScreenProps } from '../navigation/types';
 import type { CategoryId } from '../types';
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
-  const insets = useSafeAreaInsets();
   const { totalQuantity } = useCart();
+  const { colors, isDark, toggleTheme } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [showIntro, setShowIntro] = useState(true);
   const [optionsOpen, setOptionsOpen] = useState(false);
@@ -93,7 +97,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         <Modal
           visible={optionsOpen}
           transparent
-          animationType="fade"
+          animationType="slide"
           onRequestClose={() => setOptionsOpen(false)}
         >
           <View style={styles.modalBackdrop}>
@@ -105,6 +109,15 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             <View style={styles.modalCard}>
               <Text style={styles.modalTitle}>Opciones</Text>
               <Text style={styles.modalLine}>Contacto: {CONTACT_EMAIL}</Text>
+              <View style={styles.themeRow}>
+                <Text style={styles.modalLine}>Modo oscuro</Text>
+                <Switch
+                  value={isDark}
+                  onValueChange={toggleTheme}
+                  trackColor={{ false: colors.border, true: colors.primary }}
+                  thumbColor={isDark ? colors.accent : colors.white}
+                />
+              </View>
               <Text style={styles.modalHint}>
                 Aquí puedes enlazar términos, horarios o ayuda.
               </Text>
@@ -122,7 +135,8 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -164,8 +178,7 @@ const styles = StyleSheet.create({
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    padding: 24,
+    justifyContent: 'flex-end',
   },
   modalDismiss: {
     ...StyleSheet.absoluteFillObject,
@@ -174,7 +187,8 @@ const styles = StyleSheet.create({
     zIndex: 2,
     elevation: 6,
     backgroundColor: colors.white,
-    borderRadius: 18,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     padding: 20,
     borderWidth: 1,
     borderColor: colors.border,
@@ -194,6 +208,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.muted,
     marginBottom: 16,
+  },
+  themeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
   modalClose: {
     alignSelf: 'flex-end',

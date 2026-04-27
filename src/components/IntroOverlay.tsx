@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 
 type Props = {
   visible: boolean;
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export function IntroOverlay({ visible, onFinish }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const opacity = useRef(new Animated.Value(1)).current;
   const translateY = useRef(new Animated.Value(16)).current;
   const finishedRef = useRef(false);
@@ -65,7 +68,8 @@ export function IntroOverlay({ visible, onFinish }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.overlay,

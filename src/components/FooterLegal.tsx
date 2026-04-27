@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { CONTACT_EMAIL } from '../constants/contact';
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 
 export function FooterLegal() {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={styles.wrap}>
       <Text style={styles.line}>Derechos reservados © {new Date().getFullYear()}</Text>
@@ -13,7 +17,8 @@ export function FooterLegal() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   wrap: {
     marginTop: 32,
     marginBottom: 24,

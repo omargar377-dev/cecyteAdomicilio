@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import type { PaymentMethod } from '../types';
 
 type Props = {
@@ -11,6 +12,9 @@ type Props = {
 };
 
 export function PaymentMethodPicker({ value, onChange }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>Forma de pago</Text>
@@ -54,7 +58,8 @@ export function PaymentMethodPicker({ value, onChange }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   wrap: {
     marginTop: 8,
   },

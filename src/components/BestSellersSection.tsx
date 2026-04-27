@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   FlatList,
   Image,
@@ -7,7 +7,8 @@ import {
   View,
 } from 'react-native';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import type { Product } from '../types';
 
 type Props = {
@@ -19,6 +20,9 @@ function formatPrice(n: number) {
 }
 
 export function BestSellersSection({ products }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   if (products.length === 0) {
     return (
       <View style={styles.section}>
@@ -51,7 +55,8 @@ export function BestSellersSection({ products }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   section: {
     marginTop: 28,
   },

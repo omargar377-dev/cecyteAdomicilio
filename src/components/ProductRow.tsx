@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -7,7 +7,8 @@ import {
   View,
 } from 'react-native';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import type { Product } from '../types';
 
 type Props = {
@@ -27,6 +28,9 @@ export function ProductRow({
   onIncrement,
   onDecrement,
 }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={styles.row}>
       <Image source={{ uri: product.imageUrl }} style={styles.image} />
@@ -57,7 +61,8 @@ export function ProductRow({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   row: {
     flexDirection: 'row',
     backgroundColor: colors.white,

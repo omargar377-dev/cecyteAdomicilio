@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import type { CartItem } from '../types';
 
 type Props = {
@@ -13,6 +14,8 @@ function formatPrice(n: number) {
 }
 
 export function CartLineItem({ item }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const lineTotal = item.product.price * item.quantity;
   return (
     <View style={styles.row}>
@@ -27,7 +30,8 @@ export function CartLineItem({ item }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',

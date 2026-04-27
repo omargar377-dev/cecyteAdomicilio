@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import type { CategoryId } from '../types';
 
 type Props = {
@@ -20,6 +21,9 @@ const ITEMS: { id: CategoryId; label: string; icon: IconName }[] = [
   ];
 
 export function CategoryGrid({ onSelect }: Props) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Categorías</Text>
@@ -43,7 +47,8 @@ export function CategoryGrid({ onSelect }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   section: {
     marginTop: 16,
   },

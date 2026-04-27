@@ -1,20 +1,60 @@
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+} from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CartProvider } from './src/context/CartContext';
+import { ThemeProvider, useAppTheme } from './src/context/ThemeContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
+
+function AppContent() {
+  const { colors, isDark } = useAppTheme();
+  const navTheme = isDark
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          background: colors.background,
+          card: colors.cream,
+          text: colors.text,
+          border: colors.border,
+          primary: colors.accent,
+        },
+      }
+    : {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: colors.background,
+          card: colors.cream,
+          text: colors.text,
+          border: colors.border,
+          primary: colors.primary,
+        },
+      };
+
+  return (
+    <>
+      <CartProvider>
+        <NavigationContainer theme={navTheme}>
+          <RootNavigator />
+        </NavigationContainer>
+      </CartProvider>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+    </>
+  );
+}
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <CartProvider>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
-      </CartProvider>
-      <StatusBar style="dark" />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

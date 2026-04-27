@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -10,8 +10,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CartLineItem } from '../components/CartLineItem';
 import { PaymentMethodPicker } from '../components/PaymentMethodPicker';
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
 import { useCart } from '../context/CartContext';
+import { useAppTheme } from '../context/ThemeContext';
 import type { CartScreenProps } from '../navigation/types';
 import type { PaymentMethod } from '../types';
 
@@ -20,6 +21,8 @@ function formatPrice(n: number) {
 }
 
 export function CartScreen({ navigation }: CartScreenProps) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const { items, totalPrice, clearCart } = useCart();
   const [payment, setPayment] = useState<PaymentMethod>('cash');
 
@@ -96,7 +99,8 @@ export function CartScreen({ navigation }: CartScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,

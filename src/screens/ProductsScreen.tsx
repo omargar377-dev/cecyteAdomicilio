@@ -1,15 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProductRow } from '../components/ProductRow';
-import { colors } from '../constants/colors';
+import type { AppColors } from '../constants/colors';
 import { useCart } from '../context/CartContext';
+import { useAppTheme } from '../context/ThemeContext';
 import { getProductsByCategory } from '../data/mockProducts';
 import type { ProductsScreenProps } from '../navigation/types';
 
 export function ProductsScreen({ navigation, route }: ProductsScreenProps) {
+  const { colors } = useAppTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const { categoryId } = route.params;
   const { items, getQuantity, increment, decrement } = useCart();
 
@@ -30,7 +33,7 @@ export function ProductsScreen({ navigation, route }: ProductsScreenProps) {
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, colors.primaryDark, styles.headerCart]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
@@ -55,7 +58,8 @@ export function ProductsScreen({ navigation, route }: ProductsScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: AppColors) =>
+  StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,

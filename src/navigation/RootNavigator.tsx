@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
-import { colors } from '../constants/colors';
+import { useAppTheme } from '../context/ThemeContext';
 import { CATEGORY_LABELS } from '../data/mockProducts';
 import { CartScreen } from '../screens/CartScreen';
 import { HomeScreen } from '../screens/HomeScreen';
@@ -12,6 +12,8 @@ import type { RootStackParamList } from './types';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
+  const { colors } = useAppTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
