@@ -15,14 +15,18 @@ type Props = {
   searchQuery: string;
   onSearchChange: (text: string) => void;
   onCartPress: () => void;
+  onAuthPress: () => void;
   cartCount: number;
+  isAuthenticated: boolean;
 };
 
 export function TopBar({
   searchQuery,
   onSearchChange,
   onCartPress,
+  onAuthPress,
   cartCount,
+  isAuthenticated,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -52,21 +56,38 @@ export function TopBar({
         />
       </View>
 
-      <TouchableOpacity
-        style={styles.cartBtn}
-        onPress={onCartPress}
-        accessibilityRole="button"
-        accessibilityLabel="Ver carrito"
-      >
-        <Ionicons name="cart-outline" size={26} color={colors.primaryDark} />
-        {cartCount > 0 ? (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              {cartCount > 99 ? '99+' : cartCount}
-            </Text>
-          </View>
-        ) : null}
-      </TouchableOpacity>
+      <View style={styles.actionsWrap}>
+        <TouchableOpacity
+          style={styles.authBtn}
+          onPress={onAuthPress}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isAuthenticated ? 'Cuenta autenticada' : 'Iniciar sesión'
+          }
+        >
+          <Ionicons
+            name={isAuthenticated ? 'person-circle' : 'person-circle-outline'}
+            size={24}
+            color={isAuthenticated ? colors.primary : colors.primaryDark}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.cartBtn}
+          onPress={onCartPress}
+          accessibilityRole="button"
+          accessibilityLabel="Ver carrito"
+        >
+          <Ionicons name="cart-outline" size={26} color={colors.primaryDark} />
+          {cartCount > 0 ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {cartCount > 99 ? '99+' : cartCount}
+              </Text>
+            </View>
+          ) : null}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -112,6 +133,21 @@ const makeStyles = (colors: AppColors) =>
     fontSize: 16,
     color: colors.text,
     paddingVertical: 8,
+  },
+  actionsWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  authBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.cream,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   cartBtn: {
     width: 48,

@@ -21,20 +21,26 @@ import { IntroOverlay } from '../components/IntroOverlay';
 import { TopBar } from '../components/TopBar';
 import type { AppColors } from '../constants/colors';
 import { CONTACT_EMAIL } from '../constants/contact';
+import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useAppTheme } from '../context/ThemeContext';
 import { getBestSellers } from '../data/mockProducts';
+import { AuthModal } from '../features/auth/presentation/components/AuthModal';
+import type { AuthTab } from '../features/auth/domain/types';
 import type { HomeScreenProps } from '../navigation/types';
 import type { CategoryId } from '../types';
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
   const { totalQuantity } = useCart();
   const { colors, isDark, toggleTheme } = useAppTheme();
+  const { isAuthenticated, userName, userEmail, logout } = useAuth();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [showIntro, setShowIntro] = useState(true);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authTab, setAuthTab] = useState<AuthTab>('login');
 
   const handleIntroFinish = useCallback(() => {
     setShowIntro(false);
@@ -67,7 +73,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onCartPress={() => navigation.navigate('Cart')}
+            onAuthPress={() => {
+              setAuthTab('login');
+              setAuthOpen(true);
+            }}
             cartCount={totalQuantity}
+            isAuthenticated={isAuthenticated}
           />
 
           <CategoryGrid onSelect={openCategory} />
@@ -109,6 +120,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             <View style={styles.modalCard}>
               <Text style={styles.modalTitle}>Opciones</Text>
               <Text style={styles.modalLine}>Contacto: {CONTACT_EMAIL}</Text>
+              <Text style={styles.modalLine}>
+                Cuenta:{' '}
+                {isAuthenticated
+                  ? `${userName ?? 'Usuario'} (${userEmail ?? ''})`
+                  : 'Sin iniciar sesión'}
+              </Text>
               <View style={styles.themeRow}>
                 <Text style={styles.modalLine}>Modo oscuro</Text>
                 <Switch
@@ -119,8 +136,31 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 />
               </View>
               <Text style={styles.modalHint}>
-                Aquí puedes enlazar términos, horarios o ayuda.
+                Aquí puedes gestionar preferencias y autenticación institucional.
               </Text>
+              {isAuthenticated ? (
+                <TouchableOpacity
+                  style={styles.modalAction}
+                  onPress={() => {
+                    logout().finally(() => setOptionsOpen(false));
+                  }}
+                >
+                  <Text style={styles.modalActionText}>Cerrar sesión</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.modalAction}
+                  onPress={() => {
+                    setOptionsOpen(false);
+                    setAuthTab('register');
+                    setAuthOpen(true);
+                  }}
+                >
+                  <Text style={styles.modalActionText}>
+                    Iniciar sesión o registrarme
+                  </Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.modalClose}
                 onPress={() => setOptionsOpen(false)}
@@ -130,6 +170,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             </View>
           </View>
         </Modal>
+
+        <AuthModal
+          visible={authOpen}
+          initialTab={authTab}
+          onClose={() => setAuthOpen(false)}
+        />
       </View>
     </SafeAreaView>
   );
@@ -219,6 +265,23 @@ const makeStyles = (colors: AppColors) =>
     alignSelf: 'flex-end',
     paddingVertical: 10,
     paddingHorizontal: 16,
+  },
+  modalAction: {
+    marginTop: 4,
+    marginBottom: 8,
+    minHeight: 46,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.cream,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+  },
+  modalActionText: {
+    color: colors.primaryDark,
+    fontSize: 15,
+    fontWeight: '700',
   },
   modalCloseText: {
     fontSize: 16,

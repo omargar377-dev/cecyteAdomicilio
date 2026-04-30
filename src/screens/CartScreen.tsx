@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,8 +12,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CartLineItem } from '../components/CartLineItem';
 import { PaymentMethodPicker } from '../components/PaymentMethodPicker';
 import type { AppColors } from '../constants/colors';
+import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useAppTheme } from '../context/ThemeContext';
+import { AuthModal } from '../features/auth/presentation/components/AuthModal';
 import type { CartScreenProps } from '../navigation/types';
 import type { PaymentMethod } from '../types';
 
@@ -22,12 +25,19 @@ function formatPrice(n: number) {
 
 export function CartScreen({ navigation }: CartScreenProps) {
   const { colors } = useAppTheme();
+  const { isAuthenticated } = useAuth();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { items, totalPrice, clearCart } = useCart();
   const [payment, setPayment] = useState<PaymentMethod>('cash');
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
 
   const pay = useCallback(() => {
     if (items.length === 0) return;
+    if (!isAuthenticated) {
+      setShowAuthPrompt(true);
+      return;
+    }
 
     const orderNumber = `#${Date.now().toString().slice(-8)}`;
     const ticketCode = `${Math.random().toString(36).substring(2, 6)}-${Math.random()
@@ -49,10 +59,11 @@ export function CartScreen({ navigation }: CartScreenProps) {
     });
 
     clearCart();
-  }, [items, totalPrice, payment, navigation, clearCart]);
+  }, [items, totalPrice, payment, navigation, clearCart, isAuthenticated]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
+    <>
+      <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
       {items.length === 0 ? (
         <View style={styles.emptyWrap}>
           <Text style={styles.emptyTitle}>Tu carrito está vacío</Text>
@@ -95,7 +106,41 @@ export function CartScreen({ navigation }: CartScreenProps) {
           />
         </>
       )}
-    </SafeAreaView>
+      </SafeAreaView>
+      <Modal
+        visible={showAuthPrompt}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowAuthPrompt(false)}
+      >
+        <View style={styles.promptBackdrop}>
+          <View style={styles.promptCard}>
+            <Text style={styles.promptTitle}>Inicia sesión para continuar</Text>
+            <Text style={styles.promptText}>
+              Para enviar el pedido, autentícate con tu correo institucional
+              @cecytebc.edu.mx.
+            </Text>
+            <TouchableOpacity
+              style={styles.promptPrimary}
+              onPress={() => {
+                setShowAuthPrompt(false);
+                setAuthOpen(true);
+              }}
+            >
+              <Text style={styles.promptPrimaryText}>Abrir autenticación</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowAuthPrompt(false)}>
+              <Text style={styles.promptCloseText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <AuthModal
+        visible={authOpen}
+        initialTab="login"
+        onClose={() => setAuthOpen(false)}
+      />
+    </>
   );
 }
 
@@ -180,5 +225,50 @@ const makeStyles = (colors: AppColors) =>
     fontSize: 17,
     fontWeight: '700',
     color: colors.primary,
+  },
+  promptBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 22,
+  },
+  promptCard: {
+    width: '100%',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    padding: 18,
+  },
+  promptTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  promptText: {
+    fontSize: 15,
+    lineHeight: 21,
+    color: colors.muted,
+    marginBottom: 14,
+  },
+  promptPrimary: {
+    minHeight: 48,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  promptPrimaryText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  promptCloseText: {
+    marginTop: 12,
+    textAlign: 'center',
+    color: colors.primary,
+    fontWeight: '700',
   },
 });
