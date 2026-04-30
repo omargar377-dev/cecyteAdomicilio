@@ -34,8 +34,24 @@ export function TopBar({
   return (
     <View style={styles.row}>
       <View style={styles.logoWrap}>
-        <Text style={styles.logoText}>☕</Text>
-        <Text style={styles.logoLabel}>CECyte</Text>
+        <TouchableOpacity
+          style={styles.logoButton}
+          onPress={onAuthPress}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isAuthenticated ? 'Cuenta autenticada CECyte' : 'Abrir autenticación'
+          }
+        >
+          <Text style={styles.logoText}>☕</Text>
+          <Text
+            style={[
+              styles.logoLabel,
+              isAuthenticated && styles.logoLabelAuthenticated,
+            ]}
+          >
+            CECyte
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.searchWrap}>
@@ -57,21 +73,6 @@ export function TopBar({
       </View>
 
       <View style={styles.actionsWrap}>
-        <TouchableOpacity
-          style={styles.authBtn}
-          onPress={onAuthPress}
-          accessibilityRole="button"
-          accessibilityLabel={
-            isAuthenticated ? 'Cuenta autenticada' : 'Iniciar sesión'
-          }
-        >
-          <Ionicons
-            name={isAuthenticated ? 'person-circle' : 'person-circle-outline'}
-            size={24}
-            color={isAuthenticated ? colors.primary : colors.primaryDark}
-          />
-        </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.cartBtn}
           onPress={onCartPress}
@@ -105,6 +106,14 @@ const makeStyles = (colors: AppColors) =>
     alignItems: 'center',
     minWidth: 56,
   },
+  logoButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+    minWidth: 56,
+    borderRadius: 10,
+    paddingHorizontal: 2,
+  },
   logoText: {
     fontSize: 28,
   },
@@ -113,6 +122,9 @@ const makeStyles = (colors: AppColors) =>
     fontWeight: '700',
     color: colors.primary,
     marginTop: -2,
+  },
+  logoLabelAuthenticated: {
+    color: colors.accent,
   },
   searchWrap: {
     flex: 1,
@@ -138,16 +150,6 @@ const makeStyles = (colors: AppColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-  },
-  authBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.cream,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   cartBtn: {
     width: 48,
