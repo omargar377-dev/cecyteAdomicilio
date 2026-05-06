@@ -20,3 +20,5 @@ export interface TicketLine {
   quantity: number;
   unitPrice: number;
 }
+
+export type { OrderId, OrderRecord } from './orders';

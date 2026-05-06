@@ -15,7 +15,6 @@ export function ProductsScreen({ navigation, route }: ProductsScreenProps) {
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { categoryId } = route.params;
   const { items, getQuantity, increment, decrement } = useCart();
-
   const products = getProductsByCategory(categoryId);
 
   const cartQty = (pid: string) => getQuantity(pid);

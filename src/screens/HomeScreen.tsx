@@ -139,14 +139,25 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 Aquí puedes gestionar preferencias y autenticación institucional.
               </Text>
               {isAuthenticated ? (
-                <TouchableOpacity
-                  style={styles.modalAction}
-                  onPress={() => {
-                    logout().finally(() => setOptionsOpen(false));
-                  }}
-                >
-                  <Text style={styles.modalActionText}>Cerrar sesión</Text>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity
+                    style={styles.modalAction}
+                    onPress={() => {
+                      setOptionsOpen(false);
+                      navigation.navigate('History');
+                    }}
+                  >
+                    <Text style={styles.modalActionText}>Historial de compras</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalAction}
+                    onPress={() => {
+                      logout().finally(() => setOptionsOpen(false));
+                    }}
+                  >
+                    <Text style={styles.modalActionText}>Cerrar sesión</Text>
+                  </TouchableOpacity>
+                </>
               ) : (
                 <TouchableOpacity
                   style={styles.modalAction}

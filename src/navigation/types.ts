@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Home: undefined;
   Products: { categoryId: CategoryId };
   Cart: undefined;
+  History: undefined;
   Ticket: {
     orderNumber: string;
     ticketCode: string;
@@ -21,6 +22,10 @@ export type ProductsScreenProps = NativeStackScreenProps<
   'Products'
 >;
 export type CartScreenProps = NativeStackScreenProps<RootStackParamList, 'Cart'>;
+export type HistoryScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  'History'
+>;
 export type TicketScreenProps = NativeStackScreenProps<
   RootStackParamList,
   'Ticket'

@@ -15,6 +15,8 @@ import type { AppColors } from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useAppTheme } from '../context/ThemeContext';
+import { OrdersService } from '../features/orders/application/OrdersService';
+import { LocalOrdersAdapter } from '../features/orders/infrastructure/LocalOrdersAdapter';
 import { AuthModal } from '../features/auth/presentation/components/AuthModal';
 import type { CartScreenProps } from '../navigation/types';
 import type { PaymentMethod } from '../types';
@@ -23,18 +25,24 @@ function formatPrice(n: number) {
   return `$${n.toFixed(2)}`;
 }
 
+const ordersService = new OrdersService(new LocalOrdersAdapter());
+
 export function CartScreen({ navigation }: CartScreenProps) {
   const { colors } = useAppTheme();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, userEmail, userName } = useAuth();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const { items, totalPrice, clearCart } = useCart();
   const [payment, setPayment] = useState<PaymentMethod>('cash');
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
 
-  const pay = useCallback(() => {
+  const pay = useCallback(async () => {
     if (items.length === 0) return;
     if (!isAuthenticated) {
+      setShowAuthPrompt(true);
+      return;
+    }
+    if (!userEmail) {
       setShowAuthPrompt(true);
       return;
     }
@@ -59,7 +67,32 @@ export function CartScreen({ navigation }: CartScreenProps) {
     });
 
     clearCart();
-  }, [items, totalPrice, payment, navigation, clearCart, isAuthenticated]);
+
+    try {
+      await ordersService.appendOrder({
+        id: `o_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+        orderNumber,
+        ticketCode,
+        userEmail,
+        userName,
+        paymentMethod: payment,
+        total: totalPrice,
+        lines,
+        createdAt: new Date().toISOString(),
+      });
+    } catch {
+      // Prevent storage issues from blocking checkout flow.
+    }
+  }, [
+    items,
+    totalPrice,
+    payment,
+    navigation,
+    clearCart,
+    isAuthenticated,
+    userEmail,
+    userName,
+  ]);
 
   return (
     <>

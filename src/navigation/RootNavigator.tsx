@@ -4,6 +4,7 @@ import React from 'react';
 import { useAppTheme } from '../context/ThemeContext';
 import { CATEGORY_LABELS } from '../data/mockProducts';
 import { CartScreen } from '../screens/CartScreen';
+import { HistoryScreen } from '../screens/HistoryScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ProductsScreen } from '../screens/ProductsScreen';
 import { TicketScreen } from '../screens/TicketScreen';
@@ -40,6 +41,11 @@ export function RootNavigator() {
         name="Cart"
         component={CartScreen}
         options={{ title: 'Carrito y pago' }}
+      />
+      <Stack.Screen
+        name="History"
+        component={HistoryScreen}
+        options={{ title: 'Historial de compras' }}
       />
       <Stack.Screen
         name="Ticket"
