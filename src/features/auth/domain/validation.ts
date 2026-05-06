@@ -24,6 +24,10 @@ export function assertCecyteEmail(email: string) {
   }
 }
 
+// Accepts real names: 2+ words made of letters (including accented), separated by a single space.
+const REAL_NAME_REGEX =
+  /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)+$/;
+
 export function validateRegisterInput(input: RegisterInput) {
   const fullName = clean(input.fullName);
   const email = normalizeEmail(input.email);
@@ -32,6 +36,12 @@ export function validateRegisterInput(input: RegisterInput) {
 
   if (!fullName) {
     throw new AuthError('NAME_REQUIRED', 'Ingresa tu nombre completo.');
+  }
+  if (!REAL_NAME_REGEX.test(fullName)) {
+    throw new AuthError(
+      'NAME_FORMAT',
+      'Ingresa tu nombre real: solo letras, separadas por un espacio (ej. Juan Pérez). Sin números ni símbolos.'
+    );
   }
   assertCecyteEmail(email);
   if (password.length < 8) {

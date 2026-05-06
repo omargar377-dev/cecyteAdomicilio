@@ -17,6 +17,7 @@ type CartContextValue = {
   increment: (product: Product) => void;
   decrement: (product: Product) => void;
   clearCart: () => void;
+  removeLine: (productId: string) => void;
 };
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -78,6 +79,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
   }, []);
 
+  const removeLine = useCallback((productId: string) => {
+    setItems((prev) => prev.filter((line) => line.product.id !== productId));
+  }, []);
+
   const totalQuantity = useMemo(
     () => items.reduce((sum, line) => sum + line.quantity, 0),
     [items]
@@ -102,6 +107,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       increment,
       decrement,
       clearCart,
+      removeLine,
     }),
     [
       items,
@@ -112,6 +118,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       increment,
       decrement,
       clearCart,
+      removeLine,
     ]
   );
 

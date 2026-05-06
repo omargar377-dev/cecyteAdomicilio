@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import type { AppColors } from '../constants/colors';
 import { useAppTheme } from '../context/ThemeContext';
 import type { CartItem } from '../types';
+import { useCart } from '../context/CartContext';
 
 type Props = {
   item: CartItem;
@@ -16,6 +17,7 @@ function formatPrice(n: number) {
 export function CartLineItem({ item }: Props) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
+  const { decrement } = useCart();
   const lineTotal = item.product.price * item.quantity;
   return (
     <View style={styles.row}>
@@ -25,7 +27,17 @@ export function CartLineItem({ item }: Props) {
           {formatPrice(item.product.price)} × {item.quantity}
         </Text>
       </View>
-      <Text style={styles.lineTotal}>{formatPrice(lineTotal)}</Text>
+      <View style={styles.rightCol}>
+        <Text style={styles.lineTotal}>{formatPrice(lineTotal)}</Text>
+        <TouchableOpacity
+          onPress={() => decrement(item.product)}
+          style={styles.removeBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Quitar una unidad de este producto del carrito"
+        >
+          <Text style={styles.removeText}>Quitar 1</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -58,5 +70,16 @@ const makeStyles = (colors: AppColors) =>
     fontSize: 17,
     fontWeight: '700',
     color: colors.primary,
+  },
+  rightCol: {
+    alignItems: 'flex-end',
+  },
+  removeBtn: {
+    marginTop: 4,
+  },
+  removeText: {
+    fontSize: 13,
+    color: colors.muted,
+    textDecorationLine: 'underline',
   },
 });
