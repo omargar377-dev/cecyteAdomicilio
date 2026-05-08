@@ -10,6 +10,7 @@ import {
 
 import type { AppColors } from '../constants/colors';
 import { useAppTheme } from '../context/ThemeContext';
+import type { Product } from '../types';
 
 type Props = {
   searchQuery: string;
@@ -18,6 +19,9 @@ type Props = {
   onAuthPress: () => void;
   cartCount: number;
   isAuthenticated: boolean;
+  suggestions: Product[];
+  showSuggestions: boolean;
+  onSuggestionSelect: (product: Product) => void;
 };
 
 export function TopBar({
@@ -27,6 +31,9 @@ export function TopBar({
   onAuthPress,
   cartCount,
   isAuthenticated,
+  suggestions,
+  showSuggestions,
+  onSuggestionSelect,
 }: Props) {
   const { colors } = useAppTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
@@ -54,22 +61,47 @@ export function TopBar({
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchWrap}>
-        <Ionicons
-          name="search"
-          size={18}
-          color={colors.muted}
-          style={styles.searchIcon}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar..."
-          placeholderTextColor={colors.muted}
-          value={searchQuery}
-          onChangeText={onSearchChange}
-          returnKeyType="search"
-          accessibilityLabel="Buscar productos"
-        />
+      <View style={styles.searchColumn}>
+        <View style={styles.searchWrap}>
+          <Ionicons
+            name="search"
+            size={18}
+            color={colors.muted}
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar..."
+            placeholderTextColor={colors.muted}
+            value={searchQuery}
+            onChangeText={onSearchChange}
+            returnKeyType="search"
+            accessibilityLabel="Buscar productos"
+          />
+        </View>
+        {showSuggestions ? (
+          <View style={styles.suggestionsCard}>
+            {suggestions.length > 0 ? (
+              <View>
+                {suggestions.map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.suggestionItem}
+                    onPress={() => onSuggestionSelect(item)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Seleccionar ${item.name}`}
+                  >
+                    <Text style={styles.suggestionText} numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.emptySuggestion}>Sin resultados</Text>
+            )}
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.actionsWrap}>
@@ -127,7 +159,6 @@ const makeStyles = (colors: AppColors) =>
     color: colors.accent,
   },
   searchWrap: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.white,
@@ -137,6 +168,9 @@ const makeStyles = (colors: AppColors) =>
     paddingHorizontal: 10,
     minHeight: 48,
   },
+  searchColumn: {
+    flex: 1,
+  },
   searchIcon: {
     marginRight: 6,
   },
@@ -145,6 +179,32 @@ const makeStyles = (colors: AppColors) =>
     fontSize: 16,
     color: colors.text,
     paddingVertical: 8,
+  },
+  suggestionsCard: {
+    marginTop: 6,
+    maxHeight: 220,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    overflow: 'hidden',
+  },
+  suggestionItem: {
+    minHeight: 42,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  suggestionText: {
+    fontSize: 15,
+    color: colors.text,
+  },
+  emptySuggestion: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    color: colors.muted,
   },
   actionsWrap: {
     flexDirection: 'row',

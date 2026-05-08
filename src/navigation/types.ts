@@ -4,7 +4,7 @@ import type { CategoryId, PaymentMethod, TicketLine } from '../types';
 
 export type RootStackParamList = {
   Home: undefined;
-  Products: { categoryId: CategoryId };
+  Products: { categoryId: CategoryId; productId?: string };
   Cart: undefined;
   History: undefined;
   Ticket: {

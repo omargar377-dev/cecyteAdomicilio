@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
+  Keyboard,
   Modal,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
@@ -24,7 +26,7 @@ import { CONTACT_EMAIL } from '../constants/contact';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useAppTheme } from '../context/ThemeContext';
-import { getBestSellers } from '../data/mockProducts';
+import { getBestSellers, searchProducts } from '../data/mockProducts';
 import { AuthModal } from '../features/auth/presentation/components/AuthModal';
 import type { AuthTab } from '../features/auth/domain/types';
 import type { HomeScreenProps } from '../navigation/types';
@@ -53,6 +55,14 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
     return base.filter((p) => p.name.toLowerCase().includes(q));
   }, [searchQuery]);
 
+  const suggestions = useMemo(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) return [];
+    return searchProducts(q).slice(0, 6);
+  }, [searchQuery]);
+
+  const showSuggestions = searchQuery.trim().length >= 2;
+
   const openCategory = useCallback(
     (categoryId: CategoryId) => {
       navigation.navigate('Products', { categoryId });
@@ -60,9 +70,21 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
     [navigation]
   );
 
+  const handleSuggestionSelect = useCallback(
+    (product: { id: string; name: string; categoryId: CategoryId }) => {
+      setSearchQuery(product.name);
+      Keyboard.dismiss();
+      navigation.navigate('Products', {
+        categoryId: product.categoryId,
+        productId: product.id,
+      });
+    },
+    [navigation]
+  );
+
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <View style={styles.root}>
+      <Pressable style={styles.root} onPress={() => Keyboard.dismiss()}>
         <IntroOverlay visible={showIntro} onFinish={handleIntroFinish} />
 
         <ScrollView
@@ -72,6 +94,9 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           <TopBar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            suggestions={suggestions}
+            showSuggestions={showSuggestions}
+            onSuggestionSelect={handleSuggestionSelect}
             onCartPress={() => navigation.navigate('Cart')}
             onAuthPress={() => {
               setAuthTab('login');
@@ -187,7 +212,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           initialTab={authTab}
           onClose={() => setAuthOpen(false)}
         />
-      </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
