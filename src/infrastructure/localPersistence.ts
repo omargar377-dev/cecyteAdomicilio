@@ -1,0 +1,21 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+/** Lectura/escritura local en el dispositivo (AsyncStorage). */
+export async function readLocalJson<T>(key: string): Promise<T | null> {
+  const raw = await AsyncStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    await AsyncStorage.removeItem(key);
+    return null;
+  }
+}
+
+export async function writeLocalJson<T>(key: string, value: T): Promise<void> {
+  await AsyncStorage.setItem(key, JSON.stringify(value));
+}
+
+export async function removeLocalKey(key: string): Promise<void> {
+  await AsyncStorage.removeItem(key);
+}

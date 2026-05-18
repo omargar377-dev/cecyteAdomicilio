@@ -13,12 +13,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import type { AppColors } from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import { useAppTheme } from '../context/ThemeContext';
-import { OrdersService } from '../features/orders/application/OrdersService';
-import { LocalOrdersAdapter } from '../features/orders/infrastructure/LocalOrdersAdapter';
+import { ordersService } from '../infrastructure/services';
 import type { HistoryScreenProps } from '../navigation/types';
 import type { OrderRecord } from '../types';
-
-const ordersService = new OrdersService(new LocalOrdersAdapter());
 
 function formatPrice(n: number) {
   return `$${n.toFixed(2)}`;

@@ -15,8 +15,7 @@ import type { AppColors } from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useAppTheme } from '../context/ThemeContext';
-import { OrdersService } from '../features/orders/application/OrdersService';
-import { LocalOrdersAdapter } from '../features/orders/infrastructure/LocalOrdersAdapter';
+import { ordersService } from '../infrastructure/services';
 import { AuthModal } from '../features/auth/presentation/components/AuthModal';
 import type { CartScreenProps } from '../navigation/types';
 import type { PaymentMethod } from '../types';
@@ -24,8 +23,6 @@ import type { PaymentMethod } from '../types';
 function formatPrice(n: number) {
   return `$${n.toFixed(2)}`;
 }
-
-const ordersService = new OrdersService(new LocalOrdersAdapter());
 
 export function CartScreen({ navigation }: CartScreenProps) {
   const { colors } = useAppTheme();
@@ -58,6 +55,26 @@ export function CartScreen({ navigation }: CartScreenProps) {
       unitPrice: line.product.price,
     }));
 
+    const orderRecord = {
+      id: `o_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+      orderNumber,
+      ticketCode,
+      userEmail,
+      userName,
+      paymentMethod: payment,
+      total: totalPrice,
+      lines,
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      await ordersService.appendOrder(orderRecord);
+    } catch {
+      // Si falla el guardado local, igual se muestra el ticket.
+    }
+
+    clearCart();
+
     navigation.replace('Ticket', {
       orderNumber,
       ticketCode,
@@ -65,24 +82,6 @@ export function CartScreen({ navigation }: CartScreenProps) {
       total: totalPrice,
       lines,
     });
-
-    clearCart();
-
-    try {
-      await ordersService.appendOrder({
-        id: `o_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
-        orderNumber,
-        ticketCode,
-        userEmail,
-        userName,
-        paymentMethod: payment,
-        total: totalPrice,
-        lines,
-        createdAt: new Date().toISOString(),
-      });
-    } catch {
-      // Prevent storage issues from blocking checkout flow.
-    }
   }, [
     items,
     totalPrice,

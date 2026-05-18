@@ -48,10 +48,30 @@ En el teléfono no uses `localhost` (apunta al propio teléfono). Opciones:
 
 - **Túnel** (otra red o problemas de firewall): `npx expo start --tunnel`.
 
+## Datos en el dispositivo
+
+La app **no usa servidor**: cuentas y sesión en **expo-secure-store**; el **historial de compras** en **AsyncStorage** (solo en el teléfono, sin límite tan estricto como Secure Store).
+
+| Qué se guarda | Dónde (clave interna) |
+|---------------|------------------------|
+| Usuarios registrados (correo, nombre, hash de contraseña) | `cecyte_auth_users_v1` |
+| Sesión activa (~6 horas) | `cecyte_auth_session_v1` |
+| Historial de compras (últimos 100 por usuario, 200 en el dispositivo) | AsyncStorage: `cecyte_orders_v1::<hash>` y `cecyte_purchase_history_v1` |
+
+**Importante:**
+
+- La **contraseña no se guarda en texto plano**, solo un hash para validar el login.
+- Los datos **no se sincronizan** con otro teléfono ni con la nube.
+- Al **desinstalar** la app o borrar datos de Expo Go, se pierde el historial.
+- Solo correos `@cecytebc.edu.mx` (validación en la app).
+
+Servicios centralizados en `src/infrastructure/services.ts` (`ProvisionalAuthAdapter` + `LocalOrdersAdapter`).
+
 ## Estructura principal
 
 - `App.tsx` — entrada y providers (carrito, navegación).
 - `src/screens/` — pantallas.
+- `src/infrastructure/` — servicios y claves de almacenamiento local.
 - `src/data/mockProducts.ts` — productos de demostración.
 - `assets/` — iconos y splash referenciados en `app.json`.
 

@@ -7,13 +7,12 @@ import React, {
   useState,
 } from 'react';
 
-import { AuthService } from '../features/auth/application/AuthService';
 import type {
   ForgotPasswordInput,
   LoginInput,
   RegisterInput,
 } from '../features/auth/domain/types';
-import { ProvisionalAuthAdapter } from '../features/auth/infrastructure/ProvisionalAuthAdapter';
+import { authService } from '../infrastructure/services';
 
 type AuthContextValue = {
   userEmail: string | null;
@@ -27,7 +26,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-const authService = new AuthService(new ProvisionalAuthAdapter());
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<{
